@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using AutoMapper;
+using HotelListing.Configurations;
 using Serilog.Events;
 
 using HotelListing.Data;
@@ -20,6 +22,7 @@ builder.Services.AddCors(o =>
             .AllowAnyHeader()
     );
 });
+builder.Services.AddAutoMapper(typeof(MapperInitializer));
 builder.Services.AddControllers();
 
 builder.Host.UseSerilog();
