@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using AutoMapper;
-using HotelListing.Configurations;
 using Serilog.Events;
 
+using HotelListing.Configurations;
 using HotelListing.Data;
+using HotelListing.IRepository;
+using HotelListing.Repository;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 );
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddCors(o =>
 {
     o.AddPolicy("AllowAllPolicy", builder => 
@@ -23,7 +27,9 @@ builder.Services.AddCors(o =>
     );
 });
 builder.Services.AddAutoMapper(typeof(MapperInitializer));
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options => 
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
 builder.Host.UseSerilog();
 
