@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Data;
 
 // Bridge between application and database
-public class DatabaseContext : DbContext
+public class DatabaseContext : IdentityDbContext<ApiUser>
 {
     public DatabaseContext(DbContextOptions options) : base(options)
     {
@@ -14,6 +15,8 @@ public class DatabaseContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        base.OnModelCreating(builder);
+        
         builder.Entity<Country>().HasData(
             new Country
             {
