@@ -8,6 +8,7 @@ public interface IUnitOfWork : IDisposable
     
     IGenericRepository<Hotel> Hotels { get; }
 
+    IGenericRepository<ApiUser> Users { get; }
     Task Save();
 
 }

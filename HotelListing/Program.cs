@@ -17,6 +17,8 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection"))
 );
 
+builder.Host.UseSerilog();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
@@ -36,8 +38,6 @@ builder.Services.AddAutoMapper(typeof(MapperInitializer));
 builder.Services.AddControllers().AddNewtonsoftJson(options => 
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-
-builder.Host.UseSerilog();
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.File(
