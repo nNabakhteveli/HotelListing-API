@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace HotelListing.Models.Hotel;
+namespace HotelListing.Models;
 
 public class HotelDTO : CreateHotelDTO
 {

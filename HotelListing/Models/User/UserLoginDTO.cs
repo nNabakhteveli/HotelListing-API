@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace HotelListing.Models.User;
+namespace HotelListing.Models;
 
 public class UserLoginDTO
 {

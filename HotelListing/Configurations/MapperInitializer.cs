@@ -2,8 +2,6 @@ using AutoMapper;
 
 using HotelListing.Data;
 using HotelListing.Models;
-using HotelListing.Models.Hotel;
-using HotelListing.Models.User;
 
 namespace HotelListing.Configurations;
 

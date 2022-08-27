@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HotelListing.Models.Hotel;
 
 namespace HotelListing.Models;
 
