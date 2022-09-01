@@ -6,6 +6,7 @@ using HotelListing.Data;
 using HotelListing.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
 
 namespace HotelListing.Services;
 
@@ -32,17 +33,17 @@ public class AuthManager : IAuthManager
     {
         var signingCredentials = GetSigningCredentials();
         var claims = await GetClaims();
-        var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
+        var token = GenerateTokenOptions(signingCredentials, claims);
 
-        return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
     
     private SigningCredentials GetSigningCredentials()
     {
-        var key = Environment.GetEnvironmentVariable("JWT_KEY");
-        var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+        var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
-        return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+        return new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
     }
 
     private async Task<List<Claim>> GetClaims()
