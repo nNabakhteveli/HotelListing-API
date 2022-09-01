@@ -78,6 +78,8 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowAllPolicy");
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

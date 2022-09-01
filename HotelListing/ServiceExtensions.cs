@@ -34,7 +34,8 @@ public static class ServiceExtensions
             {
                 ValidateIssuer = true,
                 ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
+                // ValidateIssuerSigningKey = true,
+                ValidateAudience = false,
                 ValidIssuer = jwtSettings.GetSection("Issuer").Value,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
             };
