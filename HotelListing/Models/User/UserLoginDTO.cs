@@ -11,6 +11,4 @@ public class UserLoginDTO
     [Required]
     [StringLength(15, ErrorMessage = "Maximum length for a password is 15 characters")]
     public string Password { get; set; }
-
-    public ICollection<string> Roles { get; set; }
 }
