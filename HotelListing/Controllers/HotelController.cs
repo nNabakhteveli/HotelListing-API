@@ -128,4 +128,40 @@ public class HotelController : ControllerBase
             return StatusCode(500, "Internal server error. Please try again later.");
         }
     }
+    
+    [Authorize]
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteHotel(int id)
+    {
+        if (id < 1)
+        {
+            _logger.LogError($"Invalid DELETE request attempt in {this.GetType().Name}");
+        }
+
+        try
+        {
+            var hotel = await _unitOfWork.Hotels.Get(q => q.Id == id);
+
+            if (hotel == null)
+            {
+                _logger.LogError($"Invalid DELETE request attempt in {this.GetType().Name}");
+                return BadRequest("Submitted data is invalid.");
+            }
+
+            await _unitOfWork.Hotels.Delete(id);
+            await _unitOfWork.Save();
+
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            Console.WriteLine(e);
+            _logger.LogError($"Something went wrong in {this.GetType().Name}");
+            return StatusCode(500, "Internal server error. Please try again later.");
+        }
+    }
 }
