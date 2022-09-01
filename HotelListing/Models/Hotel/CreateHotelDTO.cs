@@ -17,6 +17,6 @@ public class CreateHotelDTO
     [Range(0, 5, ErrorMessage = "Rating must be between 0 - 5")]
     public double Rating { get; set; }
     
-    [Required]
+    // [Required]
     public int CountryId { get; set; }
 }
