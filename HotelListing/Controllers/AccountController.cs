@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+
 using HotelListing.Models;
 using HotelListing.Data;
 using HotelListing.IRepository;

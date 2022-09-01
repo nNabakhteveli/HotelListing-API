@@ -1,10 +1,11 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 using HotelListing.Data;
 using HotelListing.IRepository;
 using HotelListing.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace HotelListing.Controllers;
 
@@ -26,11 +27,11 @@ public class CountryController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetCountries()
+    public async Task<IActionResult> GetCountries([FromQuery] RequestParams requestParams)
     {
         try
         {
-            var countries = await _unitOfWork.Countries.GetAll();
+            var countries = await _unitOfWork.Countries.GetAll(requestParams);
             var results = _mapper.Map<IList<CountryDTO>>(countries);
 
             return Ok(results);
