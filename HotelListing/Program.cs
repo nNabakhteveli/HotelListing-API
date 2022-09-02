@@ -72,9 +72,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment()) { }
 
 app.UseSwagger();
+
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+// Global error handling
+app.ConfigureExceptionHandler();
 
 app.UseCors("AllowAllPolicy");
 

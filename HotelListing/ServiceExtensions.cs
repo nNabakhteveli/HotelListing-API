@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.IdentityModel.Tokens;
 
 using HotelListing.Data;
-using Microsoft.IdentityModel.Tokens;
+using HotelListing.Models;
+using Serilog;
 
 namespace HotelListing;
 
@@ -39,6 +42,30 @@ public static class ServiceExtensions
                 ValidIssuer = jwtSettings.GetSection("Issuer").Value,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
             };
+        });
+    }
+
+    public static void ConfigureExceptionHandler(this IApplicationBuilder app)
+    {
+        app.UseExceptionHandler(error =>
+        {
+            error.Run(async context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                context.Response.ContentType = "application/json";
+                var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+
+                if (contextFeature != null)
+                {
+                    Log.Error($"Something went wrong in the {contextFeature.Error}");
+
+                    await context.Response.WriteAsync(new Error
+                    {
+                        StatusCode = context.Response.StatusCode,
+                        Message = "Internal server error. Please try again later."
+                    }.ToString());
+                }
+            });
         });
     }
 }

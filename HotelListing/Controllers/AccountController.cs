@@ -1,7 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-
 using HotelListing.Models;
 using HotelListing.Data;
 using HotelListing.IRepository;
@@ -19,7 +18,8 @@ public class AccountController : ControllerBase
     private readonly IAuthManager _authManager;
     private readonly IMapper _mapper;
 
-    public AccountController(UserManager<ApiUser> userManager, ILogger<AccountController> logger, IMapper mapper, IUnitOfWork unitOfWork, IAuthManager authManager)
+    public AccountController(UserManager<ApiUser> userManager, ILogger<AccountController> logger, IMapper mapper,
+        IUnitOfWork unitOfWork, IAuthManager authManager)
     {
         _userManager = userManager;
         _logger = logger;
@@ -33,7 +33,7 @@ public class AccountController : ControllerBase
     {
         return await _unitOfWork.Users.GetAll();
     }
-    
+
     [HttpPost]
     [Route("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -47,31 +47,22 @@ public class AccountController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        try
+        var user = _mapper.Map<ApiUser>(userDTO);
+        user.UserName = userDTO.Email;
+        var result = await _userManager.CreateAsync(user, userDTO.Password);
+
+        if (!result.Succeeded)
         {
-            var user = _mapper.Map<ApiUser>(userDTO);
-            user.UserName = userDTO.Email;
-            var result = await _userManager.CreateAsync(user, userDTO.Password);
-
-            if (!result.Succeeded)
+            foreach (var error in result.Errors)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(error.Code, error.Description);
-                }
-
-                return BadRequest(ModelState);
+                ModelState.AddModelError(error.Code, error.Description);
             }
 
-            await _userManager.AddToRolesAsync(user, userDTO.Roles);
-            return Ok();
+            return BadRequest(ModelState);
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            _logger.LogError(e, $"Something went wrong in the {this.GetType().Name}");
-            return Problem($"Something went wrong in the {this.GetType().Name}", statusCode: 500);
-        }
+
+        await _userManager.AddToRolesAsync(user, userDTO.Roles);
+        return Ok();
     }
 
     [HttpPost]
@@ -80,7 +71,7 @@ public class AccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Login([FromBody] UserLoginDTO userDTO) 
+    public async Task<IActionResult> Login([FromBody] UserLoginDTO userDTO)
     {
         _logger.LogInformation($"Login attempt for {userDTO.Email}");
 
@@ -89,19 +80,11 @@ public class AccountController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        try
+        if (!await _authManager.ValidateUser(userDTO))
         {
-            if (!await _authManager.ValidateUser(userDTO))
-            {
-                return Unauthorized();
-            }
+            return Unauthorized();
+        }
 
-            return Accepted(new { Token = await _authManager.CreateToken() });
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, $"Something went wrong in the {this.GetType().Name}");
-            return Problem($"Something went wrong in the {this.GetType().Name}", statusCode: 500);
-        }
+        return Accepted(new { Token = await _authManager.CreateToken() });
     }
 }
