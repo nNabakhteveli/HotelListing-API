@@ -29,7 +29,7 @@ public class HotelController : ControllerBase
     {
         var hotels = await _unitOfWork.Hotels.GetAll(requestParams);
         var results = _mapper.Map<IList<HotelDTO>>(hotels);
-
+        
         return Ok(results);
     }
 
@@ -53,7 +53,7 @@ public class HotelController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogError($"Invalid POST request attempt in {this.GetType().Name}");
+            CommonErrorMessages.LogInvalidRequestAttempt(_logger, HttpContext.Request.Method, this.GetType().Name);
             return BadRequest(ModelState);
         }
 
@@ -74,16 +74,16 @@ public class HotelController : ControllerBase
     {
         if (!ModelState.IsValid || id < 1)
         {
-            _logger.LogError($"Invalid PUT request attempt in {this.GetType().Name}");
+            CommonErrorMessages.LogInvalidRequestAttempt(_logger, HttpContext.Request.Method, this.GetType().Name);
             return BadRequest();
         }
-
+        
         var hotel = await _unitOfWork.Hotels.Get(q => q.Id == id);
 
         if (hotel == null)
         {
-            _logger.LogError($"Invalid PUT request attempt in {this.GetType().Name}");
-            return BadRequest("Submited data is invalid");
+            CommonErrorMessages.LogInvalidRequestAttempt(_logger, HttpContext.Request.Method, this.GetType().Name);
+            return BadRequest(CommonErrorMessages.InvalidSubmittedData);
         }
 
         _mapper.Map(updateHotelDto, hotel);
@@ -103,7 +103,7 @@ public class HotelController : ControllerBase
     {
         if (id < 1)
         {
-            _logger.LogError($"Invalid DELETE request attempt in {this.GetType().Name}");
+            CommonErrorMessages.LogInvalidRequestAttempt(_logger, HttpContext.Request.Method, this.GetType().Name);
             return BadRequest();
         }
 
@@ -111,8 +111,8 @@ public class HotelController : ControllerBase
 
         if (hotel == null)
         {
-            _logger.LogError($"Invalid DELETE request attempt in {this.GetType().Name}");
-            return BadRequest("Submitted data is invalid.");
+            CommonErrorMessages.LogInvalidRequestAttempt(_logger, HttpContext.Request.Method, this.GetType().Name);
+            return BadRequest(CommonErrorMessages.InvalidSubmittedData);
         }
 
         await _unitOfWork.Hotels.Delete(id);

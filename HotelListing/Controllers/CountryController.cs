@@ -2,6 +2,7 @@ using AutoMapper;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+
 using HotelListing.Data;
 using HotelListing.IRepository;
 using HotelListing.Models;
@@ -71,7 +72,7 @@ public class CountryController : ControllerBase
     {
         if (!ModelState.IsValid || id < 1)
         {
-            _logger.LogError($"Invalid PUT request attempt in {this.GetType().Name}");
+            CommonErrorMessages.LogInvalidRequestAttempt(_logger, HttpContext.Request.Method, this.GetType().Name);
             return BadRequest();
         }
 
@@ -79,8 +80,8 @@ public class CountryController : ControllerBase
 
         if (country == null)
         {
-            _logger.LogError($"Invalid PUT request attempt in {this.GetType().Name}");
-            return BadRequest("Submited data is invalid");
+            CommonErrorMessages.LogInvalidRequestAttempt(_logger, HttpContext.Request.Method, this.GetType().Name);
+            return BadRequest(CommonErrorMessages.InvalidSubmittedData);
         }
 
         _mapper.Map(updateCountryDto, country);
@@ -100,16 +101,16 @@ public class CountryController : ControllerBase
     {
         if (id < 1)
         {
-            _logger.LogError($"Invalid DELETE request attempt in {this.GetType().Name}");
-            return BadRequest("Submitted data is invalid.");
+            CommonErrorMessages.LogInvalidRequestAttempt(_logger, HttpContext.Request.Method, this.GetType().Name);
+            return BadRequest(CommonErrorMessages.InvalidSubmittedData);
         }
             
         var country = await _unitOfWork.Countries.Get(q => q.Id == id);
 
         if (country == null)
         {
-            _logger.LogError($"Invalid DELETE request attempt in {this.GetType().Name}");
-            return BadRequest("Submitted data is invalid.");
+            CommonErrorMessages.LogInvalidRequestAttempt(_logger, HttpContext.Request.Method, this.GetType().Name);
+            return BadRequest(CommonErrorMessages.InvalidSubmittedData);
         }
 
         await _unitOfWork.Countries.Delete(id);
