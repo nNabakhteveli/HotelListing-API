@@ -28,6 +28,7 @@ builder.Services.AddScoped<IAuthManager, AuthManager>();
 
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
+builder.Services.ConfigureVersioning();
 builder.Services.ConfigureJWT(builder.Configuration);
 
 builder.Services.AddCors(o =>

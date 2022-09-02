@@ -52,10 +52,7 @@ public class CountryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateCountry([FromBody] CreateCountryDTO createCountryDto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest();
-        }
+        if (!ModelState.IsValid) return BadRequest();
 
         var country = _mapper.Map<Country>(createCountryDto);
 
@@ -104,8 +101,9 @@ public class CountryController : ControllerBase
         if (id < 1)
         {
             _logger.LogError($"Invalid DELETE request attempt in {this.GetType().Name}");
+            return BadRequest("Submitted data is invalid.");
         }
-
+            
         var country = await _unitOfWork.Countries.Get(q => q.Id == id);
 
         if (country == null)

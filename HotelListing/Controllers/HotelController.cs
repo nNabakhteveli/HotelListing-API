@@ -104,6 +104,7 @@ public class HotelController : ControllerBase
         if (id < 1)
         {
             _logger.LogError($"Invalid DELETE request attempt in {this.GetType().Name}");
+            return BadRequest();
         }
 
         var hotel = await _unitOfWork.Hotels.Get(q => q.Id == id);
