@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using HotelListing.Data;
 using HotelListing.IRepository;
 using HotelListing.Models;
+using Marvin.Cache.Headers;
 
 namespace HotelListing.Controllers;
 
@@ -23,8 +24,10 @@ public class CountryController : ControllerBase
         _logger = logger;
         _mapper = mapper;
     }
-
+    
     [HttpGet]
+    [HttpCacheExpiration(CacheLocation = CacheLocation.Public)] // Overriding default global caching settings
+    [HttpCacheValidation(MustRevalidate = false)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetCountries([FromQuery] RequestParams requestParams)
@@ -36,6 +39,7 @@ public class CountryController : ControllerBase
     }
 
     [HttpGet("{id:int}", Name = "GetCountry")]
+    [ResponseCache(CacheProfileName = "120SecondsDuration")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetCountry(int id)

@@ -10,6 +10,7 @@ using HotelListing.Data;
 using HotelListing.IRepository;
 using HotelListing.Repository;
 using HotelListing.Services;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthManager, AuthManager>();
 
+
+builder.Services.ConfigureHttpCacheHeaders();
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureVersioning();
@@ -40,7 +43,13 @@ builder.Services.AddCors(o =>
     );
 });
 builder.Services.AddAutoMapper(typeof(MapperInitializer));
-builder.Services.AddControllers().AddNewtonsoftJson(options => 
+builder.Services.AddControllers(config =>
+{
+    config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+    {
+        Duration = 120
+    });
+}).AddNewtonsoftJson(options => 
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
 
@@ -69,8 +78,10 @@ finally
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) { }
+
 
 app.UseSwagger();
 
@@ -78,10 +89,13 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-// Global error handling
+// Middleware for global error handling
 app.ConfigureExceptionHandler();
 
 app.UseCors("AllowAllPolicy");
+
+app.UseResponseCaching();
+app.UseHttpCacheHeaders();
 
 app.UseAuthentication();
 

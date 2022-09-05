@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 
 using HotelListing.Data;
 using HotelListing.Models;
+using Marvin.Cache.Headers;
 
 namespace HotelListing;
 
@@ -37,9 +38,9 @@ public static class ServiceExtensions
         {
             o.TokenValidationParameters = new TokenValidationParameters
             {
+                // ValidateIssuerSigningKey = true,
                 ValidateIssuer = true,
                 ValidateLifetime = true,
-                // ValidateIssuerSigningKey = true,
                 ValidateAudience = false,
                 ValidIssuer = jwtSettings.GetSection("Issuer").Value,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
@@ -80,5 +81,22 @@ public static class ServiceExtensions
             opt.DefaultApiVersion = new ApiVersion(1, 0);
             opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
         });
+    }
+
+    // Global settings for caching
+    public static void ConfigureHttpCacheHeaders(this IServiceCollection services)
+    {
+        services.AddResponseCaching();
+        services.AddHttpCacheHeaders(
+            (expirationOpt) =>
+            {
+                expirationOpt.MaxAge = 65;
+                expirationOpt.CacheLocation = CacheLocation.Private;
+            },
+            (validationOpt) =>
+            {
+                validationOpt.MustRevalidate = true;
+            }
+        );
     }
 }
