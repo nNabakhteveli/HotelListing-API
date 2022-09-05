@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
@@ -27,6 +28,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthManager, AuthManager>();
 
+builder.Services.AddMemoryCache();
+builder.Services.ConfigureRateLimiting();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.ConfigureHttpCacheHeaders();
 builder.Services.AddAuthentication();
@@ -96,6 +100,8 @@ app.UseCors("AllowAllPolicy");
 
 app.UseResponseCaching();
 app.UseHttpCacheHeaders();
+
+app.UseIpRateLimiting();
 
 app.UseAuthentication();
 
