@@ -59,7 +59,7 @@ builder.Services.AddControllers(config =>
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.File(
-        path: "/Users/nika/Desktop/dotnet/HotelListing/HotelListing/Logs/log-.txt",
+        path: "Logs/log-.txt",
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:1j}{NewLine}{Exception}",
         rollingInterval: RollingInterval.Day,
         restrictedToMinimumLevel: LogEventLevel.Information
