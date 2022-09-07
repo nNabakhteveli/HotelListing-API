@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Serilog;
 using AutoMapper;
 using Serilog.Events;
-
 using HotelListing;
 using HotelListing.Configurations;
 using HotelListing.Data;
@@ -13,14 +12,21 @@ using HotelListing.Repository;
 using HotelListing.Services;
 using Microsoft.AspNetCore.Mvc;
 
+DotNetEnv.Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddDbContext<DatabaseContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection"))
-);
 
-DotNetEnv.Env.Load();
+if (Environment.GetEnvironmentVariable("STAGE") == "dev")
+{
+    builder.Services.AddDbContext<DatabaseContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection"))
+    );
+}
+else
+{
+    builder.Services.AddDbContext<DatabaseContext>(options => options.UseInMemoryDatabase("HotelListing"));
+}
 
 builder.Host.UseSerilog();
 builder.Services.AddEndpointsApiExplorer();
@@ -40,7 +46,7 @@ builder.Services.ConfigureJWT(builder.Configuration);
 
 builder.Services.AddCors(o =>
 {
-    o.AddPolicy("AllowAllPolicy", builder => 
+    o.AddPolicy("AllowAllPolicy", builder =>
         builder.AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader()
@@ -53,7 +59,7 @@ builder.Services.AddControllers(config =>
     {
         Duration = 120
     });
-}).AddNewtonsoftJson(options => 
+}).AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
 
@@ -81,11 +87,6 @@ finally
 }
 
 var app = builder.Build();
-
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) { }
-
 
 app.UseSwagger();
 
