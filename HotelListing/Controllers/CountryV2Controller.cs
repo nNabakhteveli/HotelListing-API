@@ -9,7 +9,7 @@ using HotelListing.Models;
 namespace HotelListing.Controllers;
 
 // =========== This controller is just for testing versioning ===========
-[ApiVersion("2.0")]
+[ApiVersion("2.0", Deprecated = true)]
 [ApiController]
 [Route("api/{v:apiVersion}/country")]
 public class CountryV2Controller : ControllerBase
